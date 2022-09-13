@@ -19,7 +19,10 @@ export class User {
     @OneToMany(
         () => Contact,
         (contact) => contact.user,
-        {cascade:true}
+        {
+            cascade:true,
+            eager:true
+        }
     )
     contacts:Contact[];
 }

@@ -6,7 +6,6 @@ import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { Contact } from './entities/contact.entity';
 import { Phone } from 'src/phones/entities/phone.entity';
-import { ContactsModule } from './contacts.module';
 
 @Injectable()
 export class ContactsService {
