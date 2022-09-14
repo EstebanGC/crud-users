@@ -1,11 +1,14 @@
 import { BadRequestException,Injectable, InternalServerErrorException, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dtos/pagination.dto';
-import { Repository } from 'typeorm';
+import { Phone } from 'src/phones/entities/phone.entity';
+import { User } from 'src/users/entities/user.entity';
+import { DataSource, Repository } from 'typeorm';
 import { CreateContactDto } from './dto/create-contact.dto';
 import { UpdateContactDto } from './dto/update-contact.dto';
 import { Contact } from './entities/contact.entity';
-import { Phone } from 'src/phones/entities/phone.entity';
+
+
 
 @Injectable()
 export class ContactsService {
@@ -14,11 +17,15 @@ export class ContactsService {
 
   constructor (
 
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
     
     @InjectRepository(Phone)
-    private readonly phoneRepository: Repository<Phone>
+    private readonly phoneRepository: Repository<Phone>,
+    private readonly dataSource: DataSource,
 
     ){}
 
@@ -36,17 +43,23 @@ export class ContactsService {
     }
   }
 
-  findAll(paginationDto:PaginationDto) {
+  //Changed this function to async-await
+
+  async findAll(paginationDto:PaginationDto) {
 
     const { limit=10, offset= 0 } = paginationDto;
 
-    return this.contactRepository.find({
+    const contacts = await this.contactRepository.find({
       take: limit,
       skip: offset,
       relations:{
         phones: true,
       },
     });
+    return contacts.map((contact) => ({
+      ...contacts,
+      phones: contact.phones.map(phone=> phone)
+    }))
   }
 
 
@@ -61,11 +74,11 @@ export class ContactsService {
     const contact = await this.contactRepository.preload({
       id:id,
       ...updateContactDto,
-      phones: [],
+      // phones: [],
     });
 
     if(!contact) throw new NotFoundException(`Contact with id ${id} not found!`);
-    
+    //Possible exception to delete
     try {
       await this.contactRepository.save(contact);
       
@@ -85,7 +98,7 @@ export class ContactsService {
     if(error.code === '23505')
         throw new BadRequestException(error.detail);
       this.logger.error(error)
-      throw new InternalServerErrorException('Ayuda!')
+      throw new InternalServerErrorException('Something is going wrong!')
   }
 
 }

@@ -31,6 +31,6 @@ import { ConfigModule } from '@nestjs/config';
       }
     })
   ],
-  exports: [TypeOrmModule, JwtStrategy, PassportModule]
+  // exports: [TypeOrmModule, JwtStrategy, PassportModule]
 })
 export class UsersModule {}

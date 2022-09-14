@@ -42,6 +42,7 @@ export class PhonesService {
     return phone;
   }
 
+  // return phone added
   async update(id: string, updatePhoneDto: UpdatePhoneDto) {
     const phone = await this.phoneRepository.preload({
       id: id,
@@ -54,6 +55,7 @@ export class PhonesService {
     }catch(error){
       this.handleExceptions(error);
     }
+    return phone;
   }
 
   async remove(id: string) {
@@ -65,6 +67,6 @@ export class PhonesService {
     if(error.code === '23505')
         throw new BadRequestException(error.detail);
       this.logger.error(error)
-      throw new InternalServerErrorException('Ayuda!')
+      throw new InternalServerErrorException('Something is going wrong!')
   }
 }

@@ -53,18 +53,23 @@ export class UsersService {
     }
   }
 
-  //ToDo: page
-  findAll(paginationDto:PaginationDto) {
+  //ToDo: page  ------- Code refactoryzed
+  async findAll(paginationDto:PaginationDto) {
 
     const { limit=10, offset= 0 } = paginationDto;
 
-    return this.userRepository.find({
+    const users = await this.userRepository.find({
       take: limit,
       skip: offset,
       relations: {
         contacts:true,
       },
     });
+    //newcode
+    return users.map((user) => ({
+      ...user,
+      contacts: user.contacts.map((contact) => contact),
+    }));
   }
 
   async findOne(id: string) {
@@ -128,6 +133,6 @@ export class UsersService {
     if(error.code === '23505')
         throw new BadRequestException(error.detail);
       this.logger.error(error)
-      throw new InternalServerErrorException('Ayuda!')
+      throw new InternalServerErrorException('Something is going wrong!')
   }
 }

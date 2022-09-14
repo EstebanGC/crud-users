@@ -1,4 +1,17 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete,Query, ParseUUIDPipe} from '@nestjs/common';
+import { 
+  Controller, 
+  Get, 
+  Post, 
+  Body, 
+  Patch, 
+  Param, 
+  Delete,
+  Query, 
+  ParseUUIDPipe, 
+  UseGuards,
+  Req
+} from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -30,8 +43,14 @@ export class UsersController {
   }
 
   @Get('private')
-  testingPrivateRoute() {
-    return "Hello world!"
+  @UseGuards(AuthGuard())
+  testingPrivateRoute(
+    @Req() request: Express.Request,
+  ) {
+    return {
+      ok: true,
+      message: "Hey world, this is private"
+    }
     
   }
 
